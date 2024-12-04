@@ -45,10 +45,34 @@ module.exports = class LocationListProcessor {
         return total;
     }
 
+    calculateSimilarity(data) {
+        let totalSimilarity = 0;
+        for (let num of data.list1) {
+            totalSimilarity += this.calculateSimilarityForNumber(num, data.list2);
+        }
+        return totalSimilarity;
+    }
+
+    calculateSimilarityForNumber(num, list) {
+        let similarity = 0;
+        for (let num2 of list) {
+            if (num === num2) {
+                similarity += num;
+            }
+        }
+        return similarity;
+    }
+
     compareLists(filename) {
         const rawData = this.loadInput(filename);
         const data = this.processInputData(rawData);
         return this.calculateTotalDistance(data);
+    }
+
+    compareListsForSimilarity(filename) {
+        const rawData = this.loadInput(filename);
+        const data = this.processInputData(rawData);
+        return this.calculateSimilarity(data);
     }
 
 };

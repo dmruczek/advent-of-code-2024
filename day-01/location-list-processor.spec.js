@@ -30,6 +30,22 @@ describe('LocationListProcessor', function () {
         });
     });
 
+    describe('calculateSimilarity', function () {
+        it('should take the processed data in as an input, and output the similarity of the two lists.', function () {
+            const locationListProcessor = new LocationListProcessor();
+            const similarity = locationListProcessor.calculateSimilarity({ list1: [ 1, 2, 3, 3, 3, 4 ], list2: [ 3, 3, 3, 4, 5, 9 ] });
+            expect(similarity).toBe(31);
+        });
+    });
+
+    describe('calculateSimilarityForNumber', function () {
+        it('should take a number from the first list, and the full list of numbers from the second list, and calculate the similarity score for that number.', function () {
+            const locationListProcessor = new LocationListProcessor();
+            const similarity = locationListProcessor.calculateSimilarityForNumber(3,[ 3, 3, 3, 4, 5, 9 ]);
+            expect(similarity).toBe(9);
+        });
+    });
+    
     describe('compareLists', function () {
         it('should load the data from the input file, and then use that data to calculate the distance between all locations.', function () {
             const locationListProcessor = new LocationListProcessor();
@@ -37,5 +53,15 @@ describe('LocationListProcessor', function () {
             expect(distance).toBe(11);
         });
     });
+
+    describe('compareListsForSimilarity', function () {
+        it('should load the data from the input file, and then use that data to calculate the similarity between all locations.', function () {
+            const locationListProcessor = new LocationListProcessor();
+            const distance = locationListProcessor.compareListsForSimilarity('test-input.txt');
+            expect(distance).toBe(31);
+        });
+    });
+    
+
     
 });

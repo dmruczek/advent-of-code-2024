@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jasmine",
-    "coverage": "nyc --exclude='**/*.spec.js'  --reporter=lcov --reporter=text-summary npm run test"
+    "coverage": "nyc --exclude='**/*.spec.js'  --reporter=lcov --reporter=text-summary npm run test",
+    "postcoverage": "cp ./node_modules/nyc-dark/*.css coverage/lcov-report/"
+
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,7 @@
   "homepage": "https://github.com/dmruczek/advent-of-code-2021#readme",
   "devDependencies": {
     "jasmine": "^3.6.3",
-    "nyc": "^15.1.0"
-  },
-  "dependencies": {}
+    "nyc": "^15.1.0",
+    "nyc-dark": "^3.0.3"
+  }
 }

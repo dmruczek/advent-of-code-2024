@@ -52,11 +52,39 @@ module.exports = class ReactorReportAnalyzer {
         return true;
     }
 
+    countSafeReportsWithProblemDampenerFromData(data) {
+        let total = 0;
+        for (let report of data) {
+            if (!this.isReportSafe(report)) {
+                for (let i = 0; i < report.length; i++) {
+                    const newReport = [
+                        ...report.slice(0,i),
+                        ...report.slice(i+1)
+                    ];
+                    if (this.isReportSafe(newReport)) {
+                        total++;
+                        break;
+                    }
+                }
+            } else {
+                total ++;
+            }
+        }
+        return total;
+    }
+
     countSafeReports(filename) {
         const rawData = this.loadInput(filename);
         const data = this.processInputData(rawData);
         return this.countSafeReportsFromData(data);
-
     }
+
+    countSafeReportsWithProblemDampener(filename) {
+        const rawData = this.loadInput(filename);
+        const data = this.processInputData(rawData);
+        return this.countSafeReportsWithProblemDampenerFromData(data);
+    }
+
+
 
 };

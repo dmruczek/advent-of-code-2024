@@ -10,6 +10,16 @@ describe('ReactorReportAnalyzer', function () {
         });
     });
 
+    describe('countSafeReportsWithProblemDampener', function () {
+        it('should process the input file and count the number of reports that are considered safe including the problem dampener.', function () {
+            const reactorReportAnalyzer = new ReactorReportAnalyzer();
+            const safeReports = reactorReportAnalyzer.countSafeReportsWithProblemDampener('test-input.txt');
+            expect(safeReports).toBe(4);
+        });
+    });
+
+    
+
     describe('isReportSafe', function() {
         it('should determine whether or not this individual report data is safe.', function () {
             const reactorReportAnalyzer = new ReactorReportAnalyzer();

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jasmine",
     "coverage": "nyc --exclude='**/*.spec.js'  --reporter=lcov --reporter=text-summary npm run test",
-    "postcoverage": "cp ./node_modules/nyc-dark/*.css coverage/lcov-report/"
+    "xxpostcoverage": "cp ./node_modules/nyc-dark/*.css coverage/lcov-report/"
 
   },
   "repository": {

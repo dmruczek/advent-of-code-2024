@@ -32,20 +32,26 @@ module.exports = class PageOrderingMonitor {
     }
 
     isPrintQueueValid(printQueue, rules) {
+        const violated = this.getViolatedRules(printQueue, rules);
+        return violated.length === 0;
+    }
 
+    getViolatedRules(printQueue, rules) {
+
+        let violated = [];
         for (let rule of rules) {
             if (printQueue.includes(rule[0]) && printQueue.includes(rule[1])) {
                 const page1Index = printQueue.indexOf(rule[0]);
                 const page2Index = printQueue.indexOf(rule[1]);
 
                 if (page2Index < page1Index) {
-                    // console.log('Print Queue ' + printQueue + ' violates rule ' + rule[0] + '|' + rule[1]);
-                    return false;
+                    violated.push(rule);
                 }
             }
         }
-        return true;
+        return violated;
     }
+
 
     validatePrintQueuesAndCalculateCode(data) {
         let total = 0;
@@ -57,11 +63,37 @@ module.exports = class PageOrderingMonitor {
         return total;
     }
 
+    reorderPagesAndCalculateCode(data) {
+        let total = 0;
+        for (let printQueue of data.printQueues) {
+            let fixed = false;
+            while (this.getViolatedRules(printQueue, data.rules).length > 0) {
+                let violated = this.getViolatedRules(printQueue, data.rules);
+                for (let rule of violated) {
+                    const removed = printQueue.splice(printQueue.indexOf(rule[0]), 1)[0];
+                    printQueue.splice(printQueue.indexOf(rule[1]), 0, removed);
+                    fixed = true;
+                }
+            }
+            if (fixed) {
+                total += parseInt(printQueue[Math.floor(printQueue.length/2)]);
+            }
+        }
+        return total;
+    }
+
 
     detectValidPrintQueuesAndReturnCode(filename) {
         const stringArray = this.loadInput(filename);
         const data = this.processInputData(stringArray);
         return this.validatePrintQueuesAndCalculateCode(data);
+    }
+
+    reorderPagesAsNecessaryAndReturnCode(filename) {
+        const stringArray = this.loadInput(filename);
+        const data = this.processInputData(stringArray);
+        return this.reorderPagesAndCalculateCode(data);
+
     }
 
 };

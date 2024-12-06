@@ -1,4 +1,4 @@
-module.exports = class WordSearcher {
+module.exports = class XWordSearcher {
 
     
     loadInput(filename) {
@@ -33,36 +33,38 @@ module.exports = class WordSearcher {
         let count = 0;
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].length; j++) {
-                if (data[i][j] === 'X') {
+                if (data[i][j] === 'A') {
 
-                    for (let xDir = -1; xDir < 2; xDir++) {
-                        for (let yDir = -1; yDir < 2; yDir++) {
-                            if (this.checkDirectionForWord(data, i, j, yDir, xDir)) {
-                                count ++;
-                            }
-                        }
+                    if (this.checkForLetter('M', data, i-1, j-1) &&
+                        this.checkForLetter('S', data, i+1, j+1) &&
+                        this.checkForLetter('M', data, i+1, j-1) &&
+                        this.checkForLetter('S', data, i-1, j+1)) {
+                            count++;
                     }
+                    if (this.checkForLetter('S', data, i-1, j-1) &&
+                        this.checkForLetter('M', data, i+1, j+1) &&
+                        this.checkForLetter('M', data, i+1, j-1) &&
+                        this.checkForLetter('S', data, i-1, j+1)) {
+                            count++;
+                    }
+                    if (this.checkForLetter('S', data, i-1, j-1) &&
+                        this.checkForLetter('M', data, i+1, j+1) &&
+                        this.checkForLetter('S', data, i+1, j-1) &&
+                        this.checkForLetter('M', data, i-1, j+1)) {
+                            count++;
+                    }
+                    if (this.checkForLetter('M', data, i-1, j-1) &&
+                        this.checkForLetter('S', data, i+1, j+1) &&
+                        this.checkForLetter('S', data, i+1, j-1) &&
+                        this.checkForLetter('M', data, i-1, j+1)) {
+                            count++;
+                    }
+
                 }
             }
         }
-        // this.printData(this.foundWordsOnly);
 
         return count;
-    }
-
-    checkDirectionForWord(data, y, x, yDirection, xDirection) {
-
-        if (this.checkForLetter('M', data, y + (1 * yDirection), x + (1 * xDirection)) && 
-            this.checkForLetter('A', data, y + (2 * yDirection), x + (2 * xDirection)) && 
-            this.checkForLetter('S', data, y + (3 * yDirection), x + (3 * xDirection))) {
-
-            this.foundWordsOnly[y][x] = 'X';
-            this.foundWordsOnly[y + (1 * yDirection)][x + (1 * xDirection)] = 'M';
-            this.foundWordsOnly[y + (2 * yDirection)][x + (2 * xDirection)] = 'A';
-            this.foundWordsOnly[y + (3 * yDirection)][x + (3 * xDirection)] = 'S';
-            return true;
-        }
-        return false;
     }
 
     checkForLetter(letter, data, y, x) {
@@ -71,12 +73,6 @@ module.exports = class WordSearcher {
         }
         return false;
     }
-
-    // printData(data) {
-    //     for (let row of data) {
-    //         console.log(row.join(""));
-    //     }
-    // }
 
     findAllInstancesOfWordInFile(filename) {
         const stringArray = this.loadInput(filename);

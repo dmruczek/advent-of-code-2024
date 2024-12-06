@@ -9,4 +9,11 @@ describe('GuardPathPredictor', function () {
         });
     });
 
+    describe('placeObstructionsToSetGuardInLoop', function () {
+        it('should process the input file and determine the number of places an obstruction can be set to put the guard in a loop.', function () {
+            const guardPathPredictor = new GuardPathPredictor();
+            expect(guardPathPredictor.placeObstructionsToSetGuardInLoop('test-input.txt')).toBe(6);
+        });
+    });
+
 });

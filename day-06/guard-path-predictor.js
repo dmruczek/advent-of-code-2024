@@ -102,12 +102,82 @@ module.exports = class GuardPathPredictor {
         return count;
     }
 
+    findLoops(data) {
+        const origData = JSON.parse(JSON.stringify(data));
+        let loopableObstructionSpots = [];
+
+        // first, solve the original puzzle to find places where the guard might go:
+        this.calculateNumberOfGuardSteps(data);
+
+        // next, use the completed board to create a list of positions where obstructions could be placed in the path of the guard:
+        const possibleObstructionSpots = this.findAllPossibleObstructionLocations(data, origData);
+
+        // now loop through all of the possible obstruction spots and test each one to see if it sets the guard in a loop.
+        // for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < possibleObstructionSpots.length; i++) {
+            // console.log('Testing option ' + (i+1) + ' out of ' + possibleObstructionSpots.length);
+            let possibleObstructionSpot = possibleObstructionSpots[i];
+
+            let dataWithNewObstruction = JSON.parse(JSON.stringify(origData));
+            // console.log('trying ' + JSON.stringify(possibleObstructionSpot));
+            dataWithNewObstruction.board[possibleObstructionSpot.y][possibleObstructionSpot.x] = '#';
+
+            let visitedSpots = [];
+            visitedSpots.push("X:"+dataWithNewObstruction.guardX+";Y:"+dataWithNewObstruction.guardY+";D:"+dataWithNewObstruction.guardFace);
+
+            for (let i = 0; i < 10000; i++) {
+                // this.printBoard(dataWithNewObstruction);
+                dataWithNewObstruction = this.processGuardStep(dataWithNewObstruction);
+                const newSpot = "X:"+dataWithNewObstruction.guardX+";Y:"+dataWithNewObstruction.guardY+";D:"+dataWithNewObstruction.guardFace;
+                // console.log("visited spots " + visitedSpots);
+                if (dataWithNewObstruction.finished) {
+                    // Left the board.  No loop.
+                    break;
+                } else if (visitedSpots.includes(newSpot)) {
+                    
+                    //console.log("re-visited spot: " + newSpot);
+                    // Spot has been visited already.  I guess we're in a loop now.
+                    loopableObstructionSpots.push(possibleObstructionSpot);
+                    dataWithNewObstruction.board[possibleObstructionSpot.y][possibleObstructionSpot.x] = 'O';                    
+                    // this.printBoard(dataWithNewObstruction);
+                    break;
+                } else {
+                    visitedSpots.push(newSpot);
+                }
+            }
+        }
+
+        // console.log(loopableObstructionSpots);
+        return loopableObstructionSpots.length;
+    }
+
+    findAllPossibleObstructionLocations(data, origData) {
+
+        let possibleObstructionSpots = [];
+
+
+        for (let y = 0; y < data.board.length; y ++) {
+            for (let x = 0; x < data.board[y].length; x++) {
+                if (data.board[y][x] === 'X' && (y !== origData.guardY || x !== origData.guardX)) {
+                    possibleObstructionSpots.push({x:x, y:y});
+                }
+            }
+        }
+        return possibleObstructionSpots;
+    }
+
 
     predictGuardPathAndCalculateNumberOfSteps(filename) {
         const stringArray = this.loadInput(filename);
         const data = this.processInputData(stringArray);
         return this.calculateNumberOfGuardSteps(data);
-
     }
+
+    placeObstructionsToSetGuardInLoop(filename) {
+        const stringArray = this.loadInput(filename);
+        const data = this.processInputData(stringArray);
+        return this.findLoops(data);
+    }
+
 
 };

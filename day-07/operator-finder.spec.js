@@ -7,6 +7,12 @@ describe('OperatorFinder', function () {
             const operatorFinder = new OperatorFinder();
             expect(operatorFinder.calibrate('test-input.txt')).toBe(3749);
         });
+
+        it('should process the input file and determine which items in the list can be calculated using the given operators and add those values including concatenation if enabled', function () {
+            const operatorFinder = new OperatorFinder();
+            expect(operatorFinder.calibrate('test-input.txt', true)).toBe(11387);
+        });
+
     });
 
 

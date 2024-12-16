@@ -29,10 +29,12 @@ module.exports = class OperatorFinder {
         return data;
     }
 
-    calc(operation) {
+    calc(operation, includeConcatenationOperation) {
 
-        if (this.calculate(operation.testValue, operation.numbers[0], '*', operation.numbers.slice(1)) === operation.testValue || 
-            this.calculate(operation.testValue, operation.numbers[0], '+', operation.numbers.slice(1)) === operation.testValue) {
+        if (this.calculate(operation.testValue, operation.numbers[0], '*', operation.numbers.slice(1), includeConcatenationOperation) === operation.testValue || 
+            this.calculate(operation.testValue, operation.numbers[0], '+', operation.numbers.slice(1), includeConcatenationOperation) === operation.testValue) {
+            return operation.testValue;
+        } else if (includeConcatenationOperation && this.calculate(operation.testValue, operation.numbers[0], '||', operation.numbers.slice(1), includeConcatenationOperation) === operation.testValue) {
             return operation.testValue;
         } else {
             return 0;
@@ -40,18 +42,16 @@ module.exports = class OperatorFinder {
     }
 
 
-    calcAll(operations) {
+    calcAll(operations, includeConcatenationOperation) {
         let total = 0;
         for (let operation of operations) {
-            total += this.calc(operation);
+            let next = this.calc(operation, includeConcatenationOperation);
+            total += next;
         }
         return total;
     }
 
-
-
-
-    calculate(testValue, runningTotal, operator, remainingNums) {
+    calculate(testValue, runningTotal, operator, remainingNums, includeConcatenationOperation) {
 
         if (remainingNums.length > 0) {
             const nextNum = remainingNums[0];
@@ -59,14 +59,22 @@ module.exports = class OperatorFinder {
             let newRunningTotal;
             if (operator === '*') {
                 newRunningTotal = runningTotal * nextNum;
-            } else {
+            } else if (operator === '+') {
                 newRunningTotal = runningTotal + nextNum;
+            } else if (operator === '||') {
+                newRunningTotal = parseInt((runningTotal + '') + (nextNum + ''));
+            } else {
+                newRunningTotal = nextNum;
             }
 
             let val1 = this.calculate(testValue, newRunningTotal, '*', nextRemainingNums);
             let val2 = this.calculate(testValue, newRunningTotal, '+', nextRemainingNums);
+            let val3;
+            if (includeConcatenationOperation) {
+                val3 = this.calculate(testValue, newRunningTotal, '||', nextRemainingNums);
+            }
 
-            if (val1 === testValue || val2 === testValue) {
+            if (val1 === testValue || val2 === testValue || val3 === testValue) {
                 return testValue;
             } else {
                 return -1;
@@ -76,10 +84,10 @@ module.exports = class OperatorFinder {
         }
     }
 
-    calibrate(filename) {
+    calibrate(filename, includeConcatenationOperation) {
         const rawData = this.loadInput(filename);
         const operations = this.processInputData(rawData);
-        return this.calcAll(operations);
+        return this.calcAll(operations, includeConcatenationOperation);
         
 
     }

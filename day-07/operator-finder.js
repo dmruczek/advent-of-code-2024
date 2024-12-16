@@ -67,11 +67,11 @@ module.exports = class OperatorFinder {
                 newRunningTotal = nextNum;
             }
 
-            let val1 = this.calculate(testValue, newRunningTotal, '*', nextRemainingNums);
-            let val2 = this.calculate(testValue, newRunningTotal, '+', nextRemainingNums);
+            let val1 = this.calculate(testValue, newRunningTotal, '*', nextRemainingNums, includeConcatenationOperation);
+            let val2 = this.calculate(testValue, newRunningTotal, '+', nextRemainingNums, includeConcatenationOperation);
             let val3;
             if (includeConcatenationOperation) {
-                val3 = this.calculate(testValue, newRunningTotal, '||', nextRemainingNums);
+                val3 = this.calculate(testValue, newRunningTotal, '||', nextRemainingNums, includeConcatenationOperation);
             }
 
             if (val1 === testValue || val2 === testValue || val3 === testValue) {

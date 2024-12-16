@@ -29,23 +29,10 @@ module.exports = class OperatorFinder {
         return data;
     }
 
-    calc(operation, includeConcatenationOperation) {
-
-        if (this.calculate(operation.testValue, operation.numbers[0], '*', operation.numbers.slice(1), includeConcatenationOperation) === operation.testValue || 
-            this.calculate(operation.testValue, operation.numbers[0], '+', operation.numbers.slice(1), includeConcatenationOperation) === operation.testValue) {
-            return operation.testValue;
-        } else if (includeConcatenationOperation && this.calculate(operation.testValue, operation.numbers[0], '||', operation.numbers.slice(1), includeConcatenationOperation) === operation.testValue) {
-            return operation.testValue;
-        } else {
-            return 0;
-        }
-    }
-
-
     calcAll(operations, includeConcatenationOperation) {
         let total = 0;
         for (let operation of operations) {
-            let next = this.calc(operation, includeConcatenationOperation);
+            let next = this.calculate(operation.testValue, 0, undefined, operation.numbers, includeConcatenationOperation);
             total += next;
         }
         return total;
@@ -77,7 +64,7 @@ module.exports = class OperatorFinder {
             if (val1 === testValue || val2 === testValue || val3 === testValue) {
                 return testValue;
             } else {
-                return -1;
+                return 0;
             }
         } else {
             return runningTotal;
@@ -88,9 +75,6 @@ module.exports = class OperatorFinder {
         const rawData = this.loadInput(filename);
         const operations = this.processInputData(rawData);
         return this.calcAll(operations, includeConcatenationOperation);
-        
-
     }
-
 
 };

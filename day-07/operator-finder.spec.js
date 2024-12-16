@@ -19,7 +19,7 @@ describe('OperatorFinder', function () {
     describe('calculate', function () {
         it('X', function () {
             const operatorFinder = new OperatorFinder();
-            expect(operatorFinder.calculate(292, 11, '*', [6, 16, 20])).toBe(-1);
+            expect(operatorFinder.calculate(292, 11, '*', [6, 16, 20])).toBe(0);
             expect(operatorFinder.calculate(292, 11, '+', [6, 16, 20])).toBe(292);
         });
     });

@@ -11,7 +11,11 @@ module.exports = class DiskFragmenter {
     }
 
     processInputData(stringArray) {
-        let data = [];
+        let data = {
+            filesystem: [],
+            freeSpots: [],
+            dataBlocks: []
+        };
 
         for (let i = 0; i < stringArray[0].length; i++) {
             const chr = stringArray[0][i];
@@ -19,11 +23,18 @@ module.exports = class DiskFragmenter {
             let charToPrint = i/2 + '';
             if (i % 2 == 1) {
                 charToPrint = '.';
+                data.freeSpots.push({startIndex: data.filesystem.length, sizeOfBlock: sizeOfBlock});
+            } else {
+                data.dataBlocks.push({startIndex: data.filesystem.length, sizeOfBlock: sizeOfBlock, character: charToPrint});
             }
             for (let j = 0; j < sizeOfBlock; j++) {
-                data.push(charToPrint);
+                data.filesystem.push(charToPrint);
+
             }
         }
+        // console.log(data.freeSpots);
+        // console.log(data.dataBlocks);
+
         // console.log('\n');
         // console.log(data.join(''));
         // console.log('\n');
@@ -57,6 +68,30 @@ module.exports = class DiskFragmenter {
 
     }
 
+    moveData(data, dataBlock, newPosition) {
+
+        for (let i = 0; i < dataBlock.sizeOfBlock; i++) {
+            data.filesystem[newPosition + i] = dataBlock.character;
+            data.filesystem[dataBlock.startIndex + i] = '.';
+        }
+    }
+
+    rePositionData(data) {
+
+        for (let dataBlockToMove of data.dataBlocks.reverse()) {
+            const dataSize = dataBlockToMove.sizeOfBlock;
+            for (let i = 0; i < data.freeSpots.length; i++) {
+                const freeSpot = data.freeSpots[i];
+                if (freeSpot.sizeOfBlock >= dataSize && freeSpot.startIndex < dataBlockToMove.startIndex) {
+                    this.moveData(data, dataBlockToMove, freeSpot.startIndex);
+                    freeSpot.startIndex = freeSpot.startIndex + dataSize;
+                    freeSpot.sizeOfBlock = freeSpot.sizeOfBlock - dataSize;
+                    break;
+                }
+            }
+        }
+    }
+
     calculateChecksum(data) {
         let total = 0;
         for (let i = 0; i < data.length; i++) {
@@ -70,8 +105,15 @@ module.exports = class DiskFragmenter {
     processFilesystem(filename) {
         const rawData = this.loadInput(filename);
         const data = this.processInputData(rawData);
-        this.fragmentData(data);
-        return this.calculateChecksum(data);
+        this.fragmentData(data.filesystem);
+        return this.calculateChecksum(data.filesystem);
+    }
+
+    processFilesystemSmart(filename) {
+        const rawData = this.loadInput(filename);
+        const data = this.processInputData(rawData);
+        this.rePositionData(data);
+        return this.calculateChecksum(data.filesystem);
     }
 
 };

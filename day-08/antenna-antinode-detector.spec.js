@@ -13,6 +13,11 @@ describe('AntennaAntinodeDetector', function () {
             expect(antennaAntinodeDetector.detectTotalAntinodes('test-input-2.txt')).toBe(4);
         });
 
+        it('should calculate the total number of antinodes given the layout of antennas in the input file when accounting for resonance', function () {
+            const antennaAntinodeDetector = new AntennaAntinodeDetector();
+            expect(antennaAntinodeDetector.detectTotalAntinodes('test-input.txt', true)).toBe(34);
+        });
+
     });
 
 });

@@ -47,10 +47,13 @@ module.exports = class AntennaAntinodeDetector {
     //     }
     // }
 
-    findAntinodesForAntenna(data, antennaChar) {
+    findAntinodesForAntenna(data, antennaChar, includeResonance) {
         const allAntennaPositions = data.antennaMap[antennaChar];
         for (let i = 0; i < allAntennaPositions.length; i++) {
             const antenna1 = allAntennaPositions[i];
+            if (includeResonance) {
+                this.addAntinode(data, antenna1);
+            }
             for (let j = 0; j < allAntennaPositions.length; j++) {
                 if (i !== j) {
                     const antenna2 = allAntennaPositions[j];
@@ -58,15 +61,33 @@ module.exports = class AntennaAntinodeDetector {
                     const xDiff = antenna1.x - antenna2.x;
                     const yDiff = antenna1.y - antenna2.y;
 
-                    let antinode1 = {};
-                    let antinode2 = {};
-                    antinode1.x = antenna1.x + xDiff;
-                    antinode1.y = antenna1.y + yDiff;
+                    let antinode = {};
 
-                    antinode2.x = antenna2.x - xDiff;
-                    antinode2.y = antenna2.y - yDiff;
-                    this.addAntinode(data, antinode1);
-                    this.addAntinode(data, antinode2);
+                    // up direction
+                    antinode.x = antenna1.x + xDiff;
+                    antinode.y = antenna1.y + yDiff;
+                    this.addAntinode(data, antinode);
+                    if (includeResonance) {
+                        antinode.x = antinode.x + xDiff;
+                        antinode.y = antinode.y + yDiff;
+                        while (this.addAntinode(data, antinode)) {
+                            antinode.x = antinode.x + xDiff;
+                            antinode.y = antinode.y + yDiff;
+                        }
+                    }
+
+                    // down direction
+                    antinode.x = antenna2.x - xDiff;
+                    antinode.y = antenna2.y - yDiff;
+                    this.addAntinode(data, antinode);
+                    if (includeResonance) {
+                        antinode.x = antinode.x - xDiff;
+                        antinode.y = antinode.y - yDiff;
+                        while (this.addAntinode(data, antinode)) {
+                            antinode.x = antinode.x - xDiff;
+                            antinode.y = antinode.y - yDiff;
+                            }
+                    }
                 }
             }
         }
@@ -75,13 +96,15 @@ module.exports = class AntennaAntinodeDetector {
     addAntinode(data, antinode) {
         if (antinode.x >= 0 && antinode.x < data.board[0].length && antinode.y >= 0 && antinode.y < data.board.length) {
             data.board[antinode.y][antinode.x] = '#';
+            return true;
         }
+        return false;
     }
 
-    findAntinodes(data) {
+    findAntinodes(data, includeResonance) {
 
         for (const antennaChar in data.antennaMap) {
-            this.findAntinodesForAntenna(data, antennaChar);
+            this.findAntinodesForAntenna(data, antennaChar, includeResonance);
         }
         // this.printBoard(data.board);
     }
@@ -98,10 +121,10 @@ module.exports = class AntennaAntinodeDetector {
         return total;
     }
 
-    detectTotalAntinodes(filename) {
+    detectTotalAntinodes(filename, includeResonance) {
         const rawData = this.loadInput(filename);
         const data = this.processInputData(rawData);
-        this.findAntinodes(data);
+        this.findAntinodes(data, includeResonance);
         return this.countAntinodes(data);
     }
 

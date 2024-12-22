@@ -38,7 +38,7 @@ module.exports = class LavaTrailFinder {
     }
 
 
-    findAllTrailsForTrailhead(data, trailhead) {
+    findAllTrailsForTrailhead(data, trailhead, useRatingSystem) {
         let currentSteps = [{x: trailhead.x, y: trailhead.y}];
 
         for (let elevation = 0; elevation < 9; elevation++) {
@@ -50,19 +50,23 @@ module.exports = class LavaTrailFinder {
             }
             // console.log('raw ' + JSON.stringify(nextSteps));
 
-            // de-dupe:
-            currentSteps = [];
-            for (let position of nextSteps) {
-                
-                let found = false;
-                for (let positionToCheck of currentSteps) {
-                    if (position.x === positionToCheck.x && position.y === positionToCheck.y) {
-                        found = true;
+            if (!useRatingSystem) {
+                // de-dupe:
+                currentSteps = [];
+                for (let position of nextSteps) {
+                    
+                    let found = false;
+                    for (let positionToCheck of currentSteps) {
+                        if (position.x === positionToCheck.x && position.y === positionToCheck.y) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        currentSteps.push(position);
                     }
                 }
-                if (!found) {
-                    currentSteps.push(position);
-                }
+            } else {
+                currentSteps = nextSteps;
             }
             // console.log('elevation ' + elevation + ': ' + JSON.stringify(currentSteps));
 
@@ -108,11 +112,13 @@ module.exports = class LavaTrailFinder {
         return nextY > -1 && nextX > -1 && nextY < map.length && nextX < map[0].length && map[nextY][nextX] === (currentElevation + 1);
     }
 
-    finaAllTrailsAndCalculateTotalScore(data) {
+    finaAllTrailsAndCalculateTotalScore(data, useRatingSystem) {
         let total = 0;
 
+        // total += this.findAllTrailsForTrailhead(data, data.trailheads[0], useRatingSystem).length;
+
         for (let trailhead of data.trailheads) {
-            total += this.findAllTrailsForTrailhead(data, trailhead).length;
+            total += this.findAllTrailsForTrailhead(data, trailhead, useRatingSystem).length;
         }
         return total;
     }
@@ -122,7 +128,14 @@ module.exports = class LavaTrailFinder {
     findTrailheadsAndCalculateScore(filename) {
         const rawData = this.loadInput(filename);
         const data = this.processInputData(rawData);
-        return this.finaAllTrailsAndCalculateTotalScore(data);
+        return this.finaAllTrailsAndCalculateTotalScore(data, false);
     }
+
+    findTrailheadsAndCalculateScoreUsingRating(filename) {
+        const rawData = this.loadInput(filename);
+        const data = this.processInputData(rawData);
+        return this.finaAllTrailsAndCalculateTotalScore(data, true);
+    }
+
 
 };

@@ -36,12 +36,10 @@ module.exports = class BlinkStoneSimulator {
         return newStones;
     }
 
-    doSim(data) {
-
-
+    doSim(data, numberOfBlinks) {
         let currentStoneArray = data.stoneArray;
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < numberOfBlinks; i++) {
             let nextStoneArray = [];
             for (let stone of currentStoneArray) {
                 Array.prototype.push.apply(nextStoneArray, this.processStone(stone));
@@ -55,10 +53,10 @@ module.exports = class BlinkStoneSimulator {
 
 
 
-    simulateTwentyFiveBlinksAndCountStones(filename) {
+    simulateBlinksAndCountStones(filename, numberOfBlinks) {
         const rawData = this.loadInput(filename);
         const data = this.processInputData(rawData);
-        return this.doSim(data);
+        return this.doSim(data, numberOfBlinks);
     }
 
 
